@@ -1,0 +1,25 @@
+#ddev-generated
+# Simple template to demonstrate addon-template
+version: '3.6'
+services:
+  cypress:
+    container_name: ddev-${DDEV_SITENAME}-cypress
+    image: cypress/included
+    tty: true
+    ipc: host
+    links:
+      - web:web
+    environment:
+      - CYPRESS_baseUrl=${DDEV_PRIMARY_URL}
+      - DISPLAY
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: $DDEV_APPROOT
+    external_links:
+      - "ddev-router:${DDEV_HOSTNAME}"
+    volumes:
+      - ".:/mnt/ddev_config"
+      - ../cypress:/e2e/cypress
+      - ../cypress.env.json:/e2e/cypress.env.json
+      - ../cypress.config.js:/e2e/cypress.config.json
+    entrypoint: /bin/bash

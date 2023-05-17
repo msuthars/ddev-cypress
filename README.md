@@ -1,51 +1,82 @@
-[![tests](https://github.com/ddev/ddev-addon-template/actions/workflows/tests.yml/badge.svg)](https://github.com/ddev/ddev-addon-template/actions/workflows/tests.yml) ![project is maintained](https://img.shields.io/maintenance/yes/2024.svg)
+# DDEV-cypress <!-- omit in toc -->
 
-# ddev-addon-template <!-- omit in toc -->
+- [Introduction](#introduction)
+- [Requirements](#requirements)
+- [Steps](#steps)
+- [Commands](#commands)
+  - [`cypress-open`](#cypress-open)
+  - [`cypress-run`](#cypress-run)
 
-* [What is ddev-addon-template?](#what-is-ddev-addon-template)
-* [Components of the repository](#components-of-the-repository)
-* [Getting started](#getting-started)
+## Introduction
 
-## What is ddev-addon-template?
+[Cypress](https://www.cypress.io/) is a "complete end-to-end testing experience". It allows you to write Javascript test files that automate real browsers.  For more details, see the [Cypress Overview](https://docs.cypress.io/guides/overview/why-cypress) page.
 
-This repository is a template for providing [DDEV](https://ddev.readthedocs.io) add-ons and services.
+This recipe integrates a Cypress docker image with your DDEV project.
 
-In DDEV addons can be installed from the command line using the `ddev get` command, for example, `ddev get ddev/ddev-addon-template` or `ddev get ddev/ddev-drupal9-solr`.
+## Requirements
 
-A repository like this one is the way to get started. You can create a new repo from this one by clicking the template button in the top right corner of the page.
+- DDEV >= 1.19
+- Modern OS
+  - macOS 10.9 and above (Intel or Apple Silicon 64-bit (x64 or arm64))
+  - Linux Ubuntu 12.04 and above, Fedora 21 and Debian 8 (x86_64 or Arm 64-bit (x64 or arm64))
+  - Windows 7 and above (64-bit only)
+- Interactive mode requires a X11 server running on the host machine.
 
-![template button](images/template-button.png)
+## Steps
 
-## Components of the repository
+- Install service
 
-* The fundamental contents of the add-on service or other component. For example, in this template there is a [docker-compose.addon-template.yaml](docker-compose.addon-template.yaml) file.
-* An [install.yaml](install.yaml) file that describes how to install the service or other component.
-* A test suite in [test.bats](tests/test.bats) that makes sure the service continues to work as expected.
-* [Github actions setup](.github/workflows/tests.yml) so that the tests run automatically when you push to the repository.
+  ```shell
+  ddev get msuthars/ddev-cypress
+  ddev restart
+  ```
 
-## Getting started
+- Run cypress via `ddev cypress-open` or `ddev cypress-run` (headless).
 
-1. Choose a good descriptive name for your add-on. It should probably start with "ddev-" and include the basic service or functionality. If it's particular to a specific CMS, perhaps `ddev-<CMS>-servicename`.
-2. Create the new template repository by using the template button.
-3. Globally replace "addon-template" with the name of your add-on.
-4. Add the files that need to be added to a ddev project to the repository. For example, you might remove `docker-compose.addon-template.yaml` with the `docker-compose.*.yaml` for your recipe.
-5. Update the install.yaml to give the necessary instructions for installing the add-on.
+It is recommended to run `ddev cypress-open` first to create configuration and support files.
+This addon sets `CYPRESS_baseUrl` to DDEV's primary URL in the `docker-compose.cypress.yaml`.
 
-   * The fundamental line is the `project_files` directive, a list of files to be copied from this repo into the project `.ddev` directory.
-   * You can optionally add files to the `global_files` directive as well, which will cause files to be placed in the global `.ddev` directory, `~/.ddev`.
-   * Finally, `pre_install_commands` and `post_install_commands` are supported. These can use the host-side environment variables documented [in ddev docs](https://ddev.readthedocs.io/en/stable/users/extend/custom-commands/#environment-variables-provided).
+## Commands
 
-6. Update `tests/test.bats` to provide a reasonable test for the repository. You can run it manually with `bats tests` and it will be run on push and nightly as well. Please make sure to attend to test failures when they happen. Others will be depending on you. `bats` is a simple testing framework that just uses `bash`. You can install it with `brew install bats-core` or [see other techniques](https://bats-core.readthedocs.io/en/stable/installation.html). See [bats tutorial](https://bats-core.readthedocs.io/en/stable/).
-7. When everything is working, including the tests, you can push the repository to GitHub.
-8. Create a release on GitHub.
-9. Test manually with `ddev get <owner/repo>`.
-10. You can test PRs with `ddev get https://github.com/<user>/<repo>/tarball/<branch>`
-11. Update the README.md to describe the add-on, how to use it, and how to contribute. If there are any manual actions that have to be taken, please explain them. If it requires special configuration of the using project, please explain how to do those. Examples in [ddev/ddev-drupal9-solr](https://github.com/ddev/ddev-drupal9-solr), [ddev/ddev-memcached](github.com/ddev/ddev-memcached), and [ddev/ddev-beanstalkd](https://github.com/ddev/ddev-beanstalkd).
-12. Add a good short description to your repo, and add the label "ddev-get". It will immediately be added to the list provided by `ddev get --list --all`.
-13. When it has matured you will hopefully want to have it become an "official" maintained add-on. Open an issue in the [ddev queue](https://github.com/ddev/ddev/issues) for that.
+Cypress can run into 2 different modes: interactive and runner.
+This recipe includes 2 alias commands to help you use Cypress.
 
-Note that more advanced techniques are discussed in [DDEV docs](https://ddev.readthedocs.io/en/latest/users/extend/additional-services/#additional-service-configurations-and-add-ons-for-ddev).
+To see Cypress in interactive mode, Cypress forward XVFB messages out of the Cypress container into an X11 server running on the host machine. There are many options depending on your OS. User have reported success with the following:
 
-**Contributed and maintained by [@CONTRIBUTOR](https://github.com/CONTRIBUTOR) based on the original [ddev-contrib recipe](https://github.com/ddev/ddev-contrib/tree/master/docker-compose-services/RECIPE) by [@CONTRIBUTOR](https://github.com/CONTRIBUTOR)**
+- Windows 10 / WSL users:
+  - [GWSL](https://opticos.github.io/gwsl/tutorials/manual.html) (via [Microsoft store](ms-windows-store://pdp/?productid=9NL6KD1H33V3))
+  - [VcXsrv](https://sourceforge.net/projects/vcxsrv/) (via [chocolatey](https://community.chocolatey.org/packages/vcxsrv#versionhistory)).
+- Mac users:
+  - [XQuartz](https://www.xquartz.org/). See [Running GUI applications using Docker for Mac](https://sourabhbajaj.com/blog/2017/02/07/gui-applications-docker-mac/).
 
-**Originally Contributed by [somebody](https://github.com/somebody) in <https://github.com/ddev/ddev-contrib/>
+### `cypress-open`
+
+To open cypress in "interactive" mode, run the following command:
+
+```shell
+ddev cypress-open
+```
+
+This command also accepts arguments. Refer to the ["#cypress open" documentation](https://docs.cypress.io/guides/guides/command-line#cypress-open) for further details.
+
+Example: To open Cypress in interactive mode, and specify a config file
+
+```shell
+ddev cypress-open --config cypress.json
+```
+
+### `cypress-run`
+
+To run Cypress in "runner" mode, run the following command:
+
+```shell
+ddev cypress-run
+```
+
+This command also accepts arguments. Refer to [#cypress run](https://docs.cypress.io/guides/guides/command-line#cypress-run) page for a full list of available arguments.
+
+Example: To run all Cypress tests, using Chrome in headless mode
+
+```shell
+ddev cypress-run --browser chrome
+```
